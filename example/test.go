@@ -48,6 +48,10 @@ func main() {
 		res.DictionaryMatch,
 		res.Ok,
 	)
+
+	if !res.Ok {
+		os.Exit(1)
+	}
 }
 
 func ReadDict(path string) []string {
