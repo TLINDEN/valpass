@@ -6,7 +6,7 @@ A decade ago I designed an encryption algorithm
 just for fun and to learn more about cryptography.
 During development I wrote a little helper tool
 which I could use to verify some quality metrics
-og my algorithm:
+of my algorithm:
 [analyze.c](https://github.com/TLINDEN/twenty4/blob/master/analyze/analyze.c).
 
 This module is a re-implementation of this code
