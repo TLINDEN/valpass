@@ -18,7 +18,7 @@ with go as a reusable module.
 - uses 3 different metrics to measure password quality
 - you can configure which metric to use
 - you can also configure the quality thresholds
-- there's support for dictionary lookup, but you need to provide the dictionary
+- there's support for dictionary lookup, but you need to provide the dictionary yourself 
 - different metrics for ASCII and UTF-8 character space
 - it's reasonably fast
 - the code is small enough to just copy it into your code
@@ -32,9 +32,9 @@ to guess. Don't be fooled by those "use special characters"
 evangelists: diceware passwords as outlined in the
 well known xkcd comic are by far the best ones.
 
-However, if it's your job zo implement a register
+However, if it's your job to implement a registration 
 user interface, then sooner or later you'll need
-to validate the password the user just entered.
+to validate passwords.
 
 This module can be used for this job.
 
@@ -43,11 +43,11 @@ By default it checks 3 metrics:
 ### Entropy
 
 Entropy in this case measures the cryptographic
-strength of the password. I non-technical words:
+strength of the password. In non-technical words:
 it checks how scrambled the password looks or how
 many different bits it uses.
 
-By default we only look for printable US-ASCII characters.
+By default we only look for printable US-ASCII characters. But you can switch to UTF-8 as well.
 
 ### Character diffusion
 
@@ -55,7 +55,7 @@ Of course just measuring entropy is insufficient. For
 instance a password `12345678` consists of 8 different 
 characters and might pass the entropy check. However, as
 can be easily seen, the characters are sorted and 
-therefore this password would be s terrible one.
+therefore this password would be a terrible one.
 
 Thus, character diffusion measures how characters are
 distributed.
@@ -64,7 +64,7 @@ Keep in mind that these two metrics would flag
 the `Tr0ub4dor&3` password of the comic as pretty good,
 while in reality it's not! You might remedy 
 this problem with a longer mandatory password 
-length. But zhe harsh reality is, that people still 
+length. But the harsh reality is that people still 
 use such passwords.
 
 ### Compression
@@ -74,10 +74,11 @@ the password can be compressed. For instance, let's
 look at this run length encoding example:
 
 The string `aaabggthhhh` can be rle encoded to
-`2ab2gt4h`. The ideal password cannot be compressed
+`2ab2gt4h`. The result is shorter than the original, it is compressed.
+The ideal password cannot be compressed
 or not much.
 
-Of course ee do not use RLE. We measure compression 
+Of course we do not use RLE. We measure compression 
 using the [Flate algorithm](
 https://en.m.wikipedia.org/wiki/Deflate).
 
@@ -85,10 +86,10 @@ https://en.m.wikipedia.org/wiki/Deflate).
 
 You can supply a dictionary of words of your
 liking and check if the password under test
-matches one if the words. Submatches can also 
+matches one of the words. Submatches can also 
 be done.
 
-### Custom
+### Custom measurements
 
 You can also enable or disable certain metrics and
 you can tune the quality thresholds as needed.
