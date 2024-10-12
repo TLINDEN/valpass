@@ -2,7 +2,10 @@ package valpass_test
 
 import (
 	"bufio"
+	"fmt"
 	"os"
+	"os/exec"
+	"strings"
 	"testing"
 
 	"github.com/tlinden/valpass"
@@ -250,6 +253,56 @@ func CheckPassword(t *testing.T, password string,
 	}
 }
 
+func BenchmarkValidateEntropy(b *testing.B) {
+	passwords := GetPasswords(b.N)
+
+	for i := 0; i < b.N; i++ {
+		valpass.Validate(passwords[i], valpass.Options{Entropy: 10})
+	}
+}
+
+func BenchmarkValidateCharDist(b *testing.B) {
+	passwords := GetPasswords(b.N)
+
+	for i := 0; i < b.N; i++ {
+		valpass.Validate(passwords[i], valpass.Options{CharDistribution: 10})
+	}
+}
+
+func BenchmarkValidateCompress(b *testing.B) {
+	passwords := GetPasswords(b.N)
+
+	for i := 0; i < b.N; i++ {
+		valpass.Validate(passwords[i], valpass.Options{Compress: 10})
+	}
+}
+
+func BenchmarkValidateDict(b *testing.B) {
+	passwords := GetPasswords(b.N)
+
+	for i := 0; i < b.N; i++ {
+		valpass.Validate(passwords[i],
+			valpass.Options{Dictionary: &valpass.Dictionary{Words: ReadDict("t/american-english")}},
+		)
+	}
+}
+
+func BenchmarkValidateAll(b *testing.B) {
+	passwords := GetPasswords(b.N)
+
+	for i := 0; i < b.N; i++ {
+		valpass.Validate(passwords[i])
+	}
+}
+
+func BenchmarkValidateAllwDict(b *testing.B) {
+	passwords := GetPasswords(b.N)
+
+	for i := 0; i < b.N; i++ {
+		valpass.Validate(passwords[i], opts_dict)
+	}
+}
+
 func ReadDict(path string) []string {
 	file, err := os.Open(path)
 	if err != nil {
@@ -265,4 +318,16 @@ func ReadDict(path string) []string {
 	}
 
 	return lines
+}
+
+func GetPasswords(count int) []string {
+
+	cmd := exec.Command("pwgen", "-1", "-s", "-y", "32", fmt.Sprintf("%d", count+1))
+
+	out, err := cmd.Output()
+	if err != nil {
+		panic(cmd.Err)
+	}
+
+	return strings.Split(string(out), "\n")
 }

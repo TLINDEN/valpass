@@ -1,3 +1,9 @@
+[![Go Report Card](https://goreportcard.com/badge/github.com/tlinden/valpass)](https://goreportcard.com/report/github.com/tlinden/valpass) 
+[![Actions](https://github.com/tlinden/valpass/actions/workflows/ci.yaml/badge.svg)](https://github.com/tlinden/valpass/actions)
+[![Go Coverage](https://github.com/tlinden/valpass/wiki/coverage.svg)](https://raw.githack.com/wiki/tlinden/valpass/coverage.html)
+![GitHub License](https://img.shields.io/github/license/tlinden/valpass)
+[![GoDoc](https://godoc.org/github.com/tlinden/valpass?status.svg)](https://godoc.org/github.com/tlinden/valpass)
+
 # valpass - a small golang module to verify passwords 
 
 ## Background 
@@ -107,9 +113,85 @@ you can tune the quality thresholds as needed.
 
 ## Usage
 
-Since the module is not yet complete and undocumented,
-please look at [the example](https://github.com/TLINDEN/valpass/blob/main/example/test.go)
-how to use it.
+Usage is pretty simple:
+
+```go
+import "github.com/tlinden/valpass"
+
+[..]
+   res, err := valpass.Validate("password"); if err != nil {
+     log.Fatal(err)
+   }
+   
+   if !res.Ok {
+     log.Fatal("Password is unsecure!")
+   }
+[..]
+```
+
+You may also tune which tests you want to execute and with wich
+parameters. To do this, just supply a second argument, which must be a
+`valpas.Options` struct:
+
+```go
+type Options struct {
+        Compress         int         // minimum compression rate in percent
+        CharDistribution float64     // minimum char distribution in percent
+        Entropy          float64     // minimum entropy value in bits/char
+        Dictionary       *Dictionary // if set, lookup given dictionary, the caller provides it
+        UTF8             bool        // if true work on unicode utf-8 space, not just bytes
+}
+```
+
+To turn off a test, just set the tunable to zero.
+
+Please take a look at [the
+example](https://github.com/TLINDEN/valpass/blob/main/example/test.go)
+or at [the unit tests](https://github.com/TLINDEN/valpass/blob/main/lib_test.go).
+
+## Performance
+
+Benchmark results of version 0.0.1:
+
+```default
+% go test -bench=. -count 5
+goos: linux
+goarch: amd64
+pkg: github.com/tlinden/valpass
+cpu: Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz
+BenchmarkValidateEntropy-8         98703             12402 ns/op
+BenchmarkValidateEntropy-8         92745             12258 ns/op
+BenchmarkValidateEntropy-8         94020             12495 ns/op
+BenchmarkValidateEntropy-8         96747             12349 ns/op
+BenchmarkValidateEntropy-8         94790             12368 ns/op
+BenchmarkValidateCharDist-8        95610             12184 ns/op
+BenchmarkValidateCharDist-8        96631             12305 ns/op
+BenchmarkValidateCharDist-8        97537             12215 ns/op
+BenchmarkValidateCharDist-8        97544             13703 ns/op
+BenchmarkValidateCharDist-8        95139             15392 ns/op
+BenchmarkValidateCompress-8         2140            636274 ns/op
+BenchmarkValidateCompress-8         5883            204162 ns/op
+BenchmarkValidateCompress-8         5341            229536 ns/op
+BenchmarkValidateCompress-8         4590            221610 ns/op
+BenchmarkValidateCompress-8         5889            186709 ns/op
+BenchmarkValidateDict-8               81          13730450 ns/op
+BenchmarkValidateDict-8               78          16081013 ns/op
+BenchmarkValidateDict-8               74          17545981 ns/op
+BenchmarkValidateDict-8               92          12830625 ns/op
+BenchmarkValidateDict-8               94          12564205 ns/op
+BenchmarkValidateAll-8              5084            200770 ns/op
+BenchmarkValidateAll-8              6054            193329 ns/op
+BenchmarkValidateAll-8              5998            186064 ns/op
+BenchmarkValidateAll-8              5996            191017 ns/op
+BenchmarkValidateAll-8              6268            173846 ns/op
+BenchmarkValidateAllwDict-8          374           3054042 ns/op
+BenchmarkValidateAllwDict-8          390           3109049 ns/op
+BenchmarkValidateAllwDict-8          404           3022698 ns/op
+BenchmarkValidateAllwDict-8          393           3075163 ns/op
+BenchmarkValidateAllwDict-8          381           3112361 ns/op
+PASS
+ok      github.com/tlinden/valpass      54.017s
+```
 
 ## License 
 
