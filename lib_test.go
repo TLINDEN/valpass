@@ -12,10 +12,9 @@ import (
 )
 
 type Tests struct {
-	name   string
-	want   bool
-	negate bool
-	opts   valpass.Options
+	name string
+	want bool
+	opts valpass.Options
 }
 
 var pass_random_good = []string{
@@ -299,7 +298,10 @@ func BenchmarkValidateAllwDict(b *testing.B) {
 	passwords := GetPasswords(b.N)
 
 	for i := 0; i < b.N; i++ {
-		valpass.Validate(passwords[i], opts_dict)
+		_, err := valpass.Validate(passwords[i], opts_dict)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
