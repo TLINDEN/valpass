@@ -37,3 +37,5 @@ release: buildlocal test
 	gh release create v$(VERSION) --generate-notes
 
 
+bench:
+	go test -bench=. -count 5

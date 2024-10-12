@@ -256,7 +256,10 @@ func BenchmarkValidateEntropy(b *testing.B) {
 	passwords := GetPasswords(b.N)
 
 	for i := 0; i < b.N; i++ {
-		valpass.Validate(passwords[i], valpass.Options{Entropy: 10})
+		_, err := valpass.Validate(passwords[i], valpass.Options{Entropy: 10})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -264,7 +267,10 @@ func BenchmarkValidateCharDist(b *testing.B) {
 	passwords := GetPasswords(b.N)
 
 	for i := 0; i < b.N; i++ {
-		valpass.Validate(passwords[i], valpass.Options{CharDistribution: 10})
+		_, err := valpass.Validate(passwords[i], valpass.Options{CharDistribution: 10})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -272,7 +278,10 @@ func BenchmarkValidateCompress(b *testing.B) {
 	passwords := GetPasswords(b.N)
 
 	for i := 0; i < b.N; i++ {
-		valpass.Validate(passwords[i], valpass.Options{Compress: 10})
+		_, err := valpass.Validate(passwords[i], valpass.Options{Compress: 10})
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -280,9 +289,12 @@ func BenchmarkValidateDict(b *testing.B) {
 	passwords := GetPasswords(b.N)
 
 	for i := 0; i < b.N; i++ {
-		valpass.Validate(passwords[i],
+		_, err := valpass.Validate(passwords[i],
 			valpass.Options{Dictionary: &valpass.Dictionary{Words: ReadDict("t/american-english")}},
 		)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
@@ -290,7 +302,10 @@ func BenchmarkValidateAll(b *testing.B) {
 	passwords := GetPasswords(b.N)
 
 	for i := 0; i < b.N; i++ {
-		valpass.Validate(passwords[i])
+		_, err := valpass.Validate(passwords[i])
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
