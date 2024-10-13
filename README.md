@@ -21,7 +21,7 @@ with go as a reusable module.
 ## Features
 
 - standalone module without external dependencies
-- uses 3 different metrics to measure password quality
+- uses 5 different metrics to measure password quality
 - you can configure which metric to use
 - you can also configure the quality thresholds
 - there's support for dictionary lookup, but you need to provide the dictionary yourself 
@@ -88,6 +88,21 @@ Of course we do not use RLE. We measure compression
 using the [Flate algorithm](
 https://en.m.wikipedia.org/wiki/Deflate).
 
+### Optional: arithmetic mean value
+
+This is simply the result of summing the all the printable ascii chars
+divided by password length. The ideal value would be ~80, because most
+normal  letters hang  out in  the upper  area between  32 (space)  and
+126(tilde). We  consider a password ok,  if its mean lies  around this
+area give or  take 5.  If the  mean departs more from  this value, the
+characters are consistently  high or low (e.g. more  numbers and upper
+case  letters or  only  lower case  letters). The  latter,  5, can  be
+tweaked. The larger the number, tha laxer the result.
+
+Please be  warned, that this  metric will in  most cases give  you bad
+results on otherwise good passwords,  such as diceware passwords. Only
+use it if you know what you're doing.
+
 ### Optional: dictionary check
 
 You can supply a dictionary of words of your
@@ -103,12 +118,8 @@ you can tune the quality thresholds as needed.
 ### Future/ ToDo
 
 - checksum test using supplied checksum list, e.g. of leaked passwords
-- fuzzy testing against dictionary to catch variations
-- chi square test (see  http://www.fourmilab.ch/random/)
-- Arithmetic mean value test
-- Monte Carlo value test
-- Serial correlation
-- maybe some dieharder tests
+-  fuzzy  testing  against   dictionary  to  catch  variations,  using
+  Levenshtein or something similar.
 
 
 ## Usage

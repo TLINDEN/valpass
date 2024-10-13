@@ -182,6 +182,10 @@ var opts_dict = valpass.Options{
 	UTF8:             false,
 }
 
+var opts_mean = valpass.Options{
+	Mean: 15, // very lax in order to succeed!
+}
+
 var goodtests = []Tests{
 	{
 		name: "checkgood",
@@ -192,6 +196,14 @@ var goodtests = []Tests{
 		name: "checkgood-dict",
 		want: true,
 		opts: opts_dict,
+	},
+}
+
+var meantests = []Tests{
+	{
+		name: "checkgood-mean",
+		want: true,
+		opts: opts_mean,
 	},
 }
 
@@ -231,6 +243,11 @@ func TestValidate(t *testing.T) {
 		}
 	}
 
+	for _, tt := range meantests {
+		for _, pass := range pass_random_good {
+			CheckPassword(t, pass, tt.name, tt.want, tt.opts)
+		}
+	}
 }
 
 func CheckPassword(t *testing.T, password string,

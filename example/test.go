@@ -16,7 +16,8 @@ Compression rate         0%%             min %d%%     %d%%
 Character distribution   100%%           min %0.2f%%  %0.2f%%
 Character entropy        8.0 bits/char  min %0.2f    %0.2f bits/char
 Character redundancy     0.0%%           max %0.2f%%  %0.2f%%
-Dictionary match         false          false       %t 
+Dictionary match         false          false       %t
+Arithmetic mean             80          true        %0.2f
 ------------------------------------------------------------------
 Validation response                                 %t
 `
@@ -28,6 +29,7 @@ func main() {
 		Entropy:          valpass.MIN_ENTROPY,
 		Dictionary:       &valpass.Dictionary{Words: ReadDict("t/american-english")},
 		UTF8:             false,
+		Mean:             20, //valpass.LIMIT_MEAN,
 	}
 
 	res, err := valpass.Validate(os.Args[1], opts)
@@ -46,6 +48,7 @@ func main() {
 		100-opts.CharDistribution,
 		100-res.CharDistribution,
 		res.DictionaryMatch,
+		res.Mean,
 		res.Ok,
 	)
 

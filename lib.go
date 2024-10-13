@@ -26,6 +26,7 @@ type Options struct {
 	Entropy          float64     // minimum entropy value in bits/char
 	Dictionary       *Dictionary // if set, lookup given dictionary, the caller provides it
 	UTF8             bool        // if true work on unicode utf-8 space, not just bytes
+	Mean             float64     // if >0, calculate the arithmetic mean
 }
 
 /*
@@ -43,6 +44,14 @@ const (
 	//  we start  our ascii  arrays  at char(32),  so to  have max  95
 	// elements in the slice, we subtract 32 from each ascii code
 	MIN_ASCII byte = 32
+
+	//  arithmetic  mean limits:  we work on  chr(32) til  chr(126) in
+	// ascii. The mean value, however, is not 63 as one would suppose,
+	// but  80, because most used  printable ascii chars exist  in the
+	// upper area  of the space. So,  we take 80 as  the middle ground
+	// and go beyond 5 up or down
+	MIDDLE_MEAN float64 = 80
+	LIMIT_MEAN  float64 = 5
 )
 
 /*
@@ -54,6 +63,7 @@ type Result struct {
 	Compress         int     // actual compression rate in percent
 	CharDistribution float64 // actual character distribution in percent
 	Entropy          float64 // actual entropy value in bits/chars
+	Mean             float64 // actual arithmetic mean, close to 127.5 is best
 }
 
 /*
@@ -70,7 +80,8 @@ func Validate(passphrase string, opts ...Options) (Result, error) {
 		MIN_DIST,
 		MIN_ENTROPY,
 		nil,
-		false,
+		false, // dict: default off
+		0,     // mean: default off
 	}
 
 	if len(opts) == 1 {
@@ -142,6 +153,16 @@ func Validate(passphrase string, opts ...Options) (Result, error) {
 			result.Ok = false
 			result.DictionaryMatch = true
 		}
+	}
+
+	if options.Mean > 0 {
+		mean := GetArithmeticMean(passphrase)
+
+		if mean > (MIDDLE_MEAN+options.Mean) || mean < (MIDDLE_MEAN-options.Mean) {
+			result.Ok = false
+		}
+
+		result.Mean = mean
 	}
 
 	return result, nil
@@ -315,4 +336,28 @@ func GetDictMatch(passphrase string, dict *Dictionary) (bool, error) {
 	}
 
 	return false, nil
+}
+
+/*
+* Return  the arithmetic  mean value:
+
+	This is simply the result of summing the all the bytes (bits if the
+
+-b  option  is specified)  in  the  file  and  dividing by  the  file
+length. If the  data are close to random, this  should be about 127.5
+(0.5 for -b option output). If  the mean departs from this value, the
+values are consistently high or low.
+
+	Working on US-ASCII space
+*/
+func GetArithmeticMean(passphrase string) float64 {
+	sum := 0.0
+	count := 0.0
+
+	for _, char := range []byte(passphrase) {
+		sum += float64(char)
+		count++
+	}
+
+	return sum / count
 }
