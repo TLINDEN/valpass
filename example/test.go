@@ -28,8 +28,7 @@ func main() {
 		CharDistribution: valpass.MIN_DIST,
 		Entropy:          valpass.MIN_ENTROPY,
 		Dictionary:       &valpass.Dictionary{Words: ReadDict("t/american-english")},
-		UTF8:             false,
-		Mean:             20, //valpass.LIMIT_MEAN,
+		MeanDeviation:    20, //valpass.LIMIT_MEAN,
 	}
 
 	res, err := valpass.Validate(os.Args[1], opts)

@@ -25,7 +25,6 @@ with go as a reusable module.
 - you can configure which metric to use
 - you can also configure the quality thresholds
 - there's support for dictionary lookup, but you need to provide the dictionary yourself 
-- different metrics for ASCII and UTF-8 character space
 - it's reasonably fast
 - the code is small enough to just copy it into your code
 
@@ -53,7 +52,7 @@ strength of the password. In non-technical words:
 it checks how scrambled the password looks or how
 many different bits it uses.
 
-By default we only look for printable US-ASCII characters. But you can switch to UTF-8 as well.
+We only look for printable US-ASCII characters.
 
 ### Character diffusion
 
@@ -146,11 +145,11 @@ parameters. To do this, just supply a second argument, which must be a
 
 ```go
 type Options struct {
-        Compress         int         // minimum compression rate in percent
-        CharDistribution float64     // minimum char distribution in percent
-        Entropy          float64     // minimum entropy value in bits/char
-        Dictionary       *Dictionary // if set, lookup given dictionary, the caller provides it
-        UTF8             bool        // if true work on unicode utf-8 space, not just bytes
+	Compress         int         // minimum compression rate in percent, default 10%
+	CharDistribution float64     // minimum character distribution in percent, default 10%
+	Entropy          float64     // minimum entropy value in bits/char, default 3 bits/s
+	Dictionary       *Dictionary // lookup given dictionary, the caller has to provide it
+	MeanDeviation    float64     // minimum arithmetic mean deviation, by default disabled, standard 5
 }
 ```
 

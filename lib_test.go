@@ -11,10 +11,14 @@ import (
 	"github.com/tlinden/valpass"
 )
 
-type Tests struct {
-	name string
-	want bool
-	opts valpass.Options
+type Passwordlist [][]string
+
+type Test struct {
+	name      string
+	want      bool
+	wanterr   bool
+	opts      valpass.Options
+	passwords Passwordlist
 }
 
 var pass_random_good = []string{
@@ -145,6 +149,7 @@ var pass_worst_bad = []string{
 	`monkey`, `Daniel`, `andrea`, `chelsea`, `william`,
 	`654321`, `Hannah`, `1qaz2wsx`, `ranger`, `soccer`,
 	`!@#$%^&*`, `Thomas`, `starwars`, `trustno1`, `london`,
+	`aaaaaaaaaaaaaaaaaaaaa`, // compression fail test
 }
 
 var pass_dict_bad = []string{
@@ -166,106 +171,194 @@ var pass_dict_bad = []string{
 	`effected`, `ministry`,
 }
 
+var pass_mean_bad = []string{
+	`UT6RTLTNAK3JN2UVWJGXSLHKT4P3ECXJ`,
+	`L4HENABMJR0UZBFSFV0GPSXWZ4HEMOHO`,
+	`YTYPHSGR8XHP4C85T3YZFF4TG2OLMQVF`,
+	`TWAGHNVLMYR5RW67RNKUO8K3SPYAJID2`,
+	`MU0OCIE9ZUYBFLMSKWKCLTSWKZ6GBTLM`,
+	`GHBSLIVXCJCVUNTJBSPHXZUSE906QGZH`,
+	`PZWQMRNG8LDRTY9GVELRALXCO181O8AK`,
+	`KZYKWCUZWDG4OSREEKCKOA58JQMRUUBZ`,
+	`CKZWG3H6A2TJKJDPEFX2CESMPYTA7WBF`,
+	`RT8HGYUBUNUJMF0SLWKW8JISCRSG6L6M`,
+	`368WCV4PGAWE1MWZJWZU8JPEQILMEBHV`,
+	`W6HVUTBNAGJN4ABMWEKK5OHTIXUYTPDG`,
+	`GZXQAEWMNSKJDYVQRPYIQXJTPIDHMF9T`,
+	`AWTJNUFOTML7GC2OC04K74F30AO9A2VJ`,
+	`MTHJUGOHCTYNWICVVNEMETRYA2L2QHBE`,
+	`XHTUQVYNSBPTH8TWCRMMV6BILHV6KYOP`,
+	`MTNAROLNNZZBARVNKGGVLL8VR682GQUP`,
+	`3VDYD0CJGFQ1UQKTRQOUQ5FZ4PROITVQ`,
+	`JWOFUTKGTVG035HUFTTWHGLECAX5IYMX`,
+	`DVVMB6XXZPALLFMEFJRMSZUZIRU7CLNF`,
+	`QCNKZ82LGDHT97LGJKLEVUSU1MSX7FNH`,
+	`HWNZDPHHFIDO88FB4KMJSTBI35FEJUCN`,
+	`1MJ7DRGDQ9BETU5JJ3NPUEWVSLZB9WGP`,
+	`TCVC1RLXKIKGIVYGGWOEQXDRSHQJCJUA`,
+	`BYMT86DO8VNU0UF0FFOC3EPLMLANAYY5`,
+	`OPEBVIMRKAAGURO3BQAGFSZQ0MV9OBAJ`,
+	`BKZUICCERVRZCFPSMFZPY1UHPFEDJLUH`,
+	`ECWSDOGFI1PXHI2ZAP06O1CT8USL7HLM`,
+	`ZRNFW4CWXP5HHYBETZQFTNOL6AJ8ZMXZ`,
+	`UDV3CHYM4YJUFMIS9QCHWEO1DIZ7PH59`,
+	`KS7FYTZ12TAZ8J3MTZAPT7TGXMYNABGX`,
+	`BFNAM5SRZQGO9ENP1E14GGJR8HDZZUHS`,
+	`34IIW3TPK2IUDTYVSEGNHNR0RLI1TL7B`,
+	`7TMGYVOA4NRHSY6TF6MRHHFJ07GOW2YR`,
+	`SDS0RTQUPVAGDMNYXYCVJEV2MDT4IH5S`,
+	`IQMMSGHI5JNG5VIV5K6N11WCGGGCSBWP`,
+	`11LMWSI2YPRMOJ9MBIA4IPKFPOJPS71U`,
+	`CPMXAMBOTBQ6AHXJ1FRHWBWZUX8TENST`,
+	`LEHQVCBRSSHY482UU1MZJZGFHWKWE716`,
+	`KMCGTBIYSJXDURAX5F1QQQB3Y1UU2EF6`,
+	`VPPZ8UFNTXAANQWDIDIAQJACVZPQIQ94`,
+	`CQ3GOBWGX91FT1SVVLOLCDX54HWUYLKO`,
+	`DKRJ7CX5JCKHEKI2JKMVPCHRCT3IKKUK`,
+	`XILAMTWXXGAHHMEUPNXBP5HQEGKCFH8X`,
+	`OGJ7A3RNOCSGPPUXSPOING6AYUNZ8OSR`,
+	`LB1XL9YWUXX6Q7GJBDI0BISHG7V1PAXY`,
+	`YRUJYIOYDNYBUBQK0YY02WA45YNGTKMS`,
+	`UTPTMOILT9WI3O2ZPPASMHQYCJPO2HTT`,
+	`J6NXVXG5FN9CTWYEYQBLFVZSSALFDJEF`,
+	`CQC84VGBZMJ65I8XLRF2PBMK5X86BVMC`,
+}
+
+var pass_dictsub_bad = []string{
+	`regational`, `iminalizat`, `rconductiv`, `substantia`,
+	`oritativen`, `trocardiog`, `communicat`, `aracterist`,
+	`rofluoroca`, `trocardiog`, `scendental`, `terintelli`,
+	`ercializat`, `nsideraten`, `scendental`, `troencepha`,
+	`rehensibil`, `nspicuousn`, `aconservat`, `troencepha`,
+	`rehensiven`, `strializat`, `ianampoini`, `ianampoini`,
+	`eptualizat`, `rdenominat`, `rofluoroca`, `terrevolut`,
+	`cientiousn`, `rrelations`, `terrevolut`, `terrevolut`,
+	`titutional`, `nterpretat`, `nfranchise`, `troencepha`,
+	`radistinct`, `epresentat`, `trocardiog`, `troencepha`,
+	`ersational`, `epresentat`, `troencepha`, `troencepha`,
+	`terintelli`, `simplifica`, `simplifica`,
+	`terrevolut`, `icularizat`, `communicat`,
+}
+
+var pass_invalid = []string{
+	string([]byte{12, 16, 45, 65, 96, 145}),
+}
+
 var opts_std = valpass.Options{
 	Compress:         valpass.MIN_COMPRESS,
 	CharDistribution: valpass.MIN_DIST,
 	Entropy:          valpass.MIN_ENTROPY,
 	Dictionary:       nil,
-	UTF8:             false,
 }
 
 var opts_dict = valpass.Options{
+	Compress:         0,
+	CharDistribution: 0,
+	Entropy:          0,
+	Dictionary:       &valpass.Dictionary{Words: ReadDict("t/american-english")},
+}
+
+var opts_dictsub = valpass.Options{
 	Compress:         valpass.MIN_COMPRESS,
 	CharDistribution: valpass.MIN_DIST,
 	Entropy:          valpass.MIN_ENTROPY,
-	Dictionary:       &valpass.Dictionary{Words: ReadDict("t/american-english")},
-	UTF8:             false,
+	Dictionary:       &valpass.Dictionary{Words: ReadDict("t/american-english"), Submatch: true},
+}
+
+var opts_invaliddict = valpass.Options{
+	Compress:         0,
+	CharDistribution: 0,
+	Entropy:          0,
+	Dictionary:       &valpass.Dictionary{Words: []string{"eins", "zwei", "drei"}},
 }
 
 var opts_mean = valpass.Options{
-	Mean: 15, // very lax in order to succeed!
+	MeanDeviation: 15, // very lax in order to succeed!
 }
 
-var goodtests = []Tests{
+var tests = []Test{
 	{
-		name: "checkgood",
-		want: true,
-		opts: opts_std,
+		name:      "checkgood",
+		want:      true,
+		opts:      opts_std,
+		passwords: Passwordlist{pass_random_good, pass_diceware_good},
 	},
 	{
-		name: "checkgood-dict",
-		want: true,
-		opts: opts_dict,
-	},
-}
-
-var meantests = []Tests{
-	{
-		name: "checkgood-mean",
-		want: true,
-		opts: opts_mean,
-	},
-}
-
-var badtests = []Tests{
-	{
-		name: "checkbad",
-		want: false,
-		opts: opts_std,
+		name:      "checkgood-dict",
+		want:      true,
+		opts:      opts_dict,
+		passwords: Passwordlist{pass_random_good, pass_diceware_good},
 	},
 	{
-		name: "checkbad-dict",
-		want: false,
-		opts: opts_dict,
+		name:      "checkbad-dictsub",
+		want:      false,
+		opts:      opts_dictsub,
+		passwords: Passwordlist{pass_dictsub_bad},
+	},
+	{
+		name:      "checkgood-mean",
+		want:      true,
+		opts:      opts_mean,
+		passwords: Passwordlist{pass_random_good},
+	},
+	{
+		name:      "checkbad",
+		want:      false,
+		opts:      opts_std,
+		passwords: Passwordlist{pass_worst_bad, pass_dict_bad},
+	},
+	{
+		name:      "checkbad-dict",
+		want:      false,
+		opts:      opts_dict,
+		passwords: Passwordlist{pass_dict_bad},
+	},
+	{
+		name:      "checkinvalid",
+		want:      false,
+		wanterr:   true,
+		opts:      opts_std,
+		passwords: Passwordlist{pass_invalid},
+	},
+	{
+		name:      "checkinvalid-dict",
+		want:      false,
+		wanterr:   true,
+		opts:      opts_invaliddict,
+		passwords: Passwordlist{pass_invalid},
 	},
 }
 
 func TestValidate(t *testing.T) {
 	t.Parallel()
 
-	for _, tt := range goodtests {
-		for _, pass := range pass_random_good {
-			CheckPassword(t, pass, tt.name, tt.want, tt.opts)
-		}
-
-		for _, pass := range pass_diceware_good {
-			CheckPassword(t, pass, tt.name, tt.want, tt.opts)
-		}
-	}
-
-	for _, tt := range badtests {
-		for _, pass := range pass_worst_bad {
-			CheckPassword(t, pass, tt.name, tt.want, tt.opts)
-		}
-
-		for _, pass := range pass_dict_bad {
-			CheckPassword(t, pass, tt.name, tt.want, tt.opts)
-		}
-	}
-
-	for _, tt := range meantests {
-		for _, pass := range pass_random_good {
-			CheckPassword(t, pass, tt.name, tt.want, tt.opts)
+	for _, tt := range tests {
+		for _, passlist := range tt.passwords {
+			for _, pass := range passlist {
+				CheckPassword(t, pass, tt)
+			}
 		}
 	}
 }
 
-func CheckPassword(t *testing.T, password string,
-	name string, want bool, opts valpass.Options) {
+func CheckPassword(t *testing.T, password string, tt Test) {
 
-	result, err := valpass.Validate(password, opts)
+	result, err := valpass.Validate(password, tt.opts)
 	if err != nil {
-		t.Errorf("test %s failed with error: %s\n", name, err)
+		if tt.wanterr {
+			return
+		}
+		t.Errorf("test %s failed with error: %s. wanterr: %t\n", tt.name, err, tt.wanterr)
 	}
 
-	if want && !result.Ok {
+	if tt.want && !result.Ok {
 		t.Errorf("test %s failed. pass: %s, want: %t, got: %t, dict: %t\nresult: %v\n",
-			name, password, want, result.Ok, result.DictionaryMatch, result)
+			tt.name, password, tt.want, result.Ok, result.DictionaryMatch, result)
 	}
 
-	if !want && result.Ok {
+	if !tt.want && result.Ok {
 		t.Errorf("test %s failed. pass: %s, want: %t, got: %t, dict: %t\nresult: %v\n",
-			name, password, want, result.Ok, result.DictionaryMatch, result)
+			tt.name, password, tt.want, result.Ok, result.DictionaryMatch, result)
 	}
 }
 
