@@ -87,21 +87,6 @@ Of course we do not use RLE. We measure compression
 using the [Flate algorithm](
 https://en.m.wikipedia.org/wiki/Deflate).
 
-### Optional: arithmetic mean value
-
-This is simply the result of summing the all the printable ascii chars
-divided by password length. The ideal value would be ~80, because most
-normal  letters hang  out in  the upper  area between  32 (space)  and
-126(tilde). We  consider a password ok,  if its mean lies  around this
-area give or  take 5.  If the  mean departs more from  this value, the
-characters are consistently  high or low (e.g. more  numbers and upper
-case  letters or  only  lower case  letters). The  latter,  5, can  be
-tweaked. The larger the number, tha laxer the result.
-
-Please be  warned, that this  metric will in  most cases give  you bad
-results on otherwise good passwords,  such as diceware passwords. Only
-use it if you know what you're doing.
-
 ### Optional: dictionary check
 
 You can supply a dictionary of words of your
@@ -149,7 +134,6 @@ type Options struct {
 	CharDistribution float64     // minimum character distribution in percent, default 10%
 	Entropy          float64     // minimum entropy value in bits/char, default 3 bits/s
 	Dictionary       *Dictionary // lookup given dictionary, the caller has to provide it
-	MeanDeviation    float64     // minimum arithmetic mean deviation, by default disabled, standard 5
 }
 ```
 

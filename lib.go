@@ -26,27 +26,18 @@ type Options struct {
 	CharDistribution float64     // minimum character distribution in percent, default 10%
 	Entropy          float64     // minimum entropy value in bits/char, default 3 bits/s
 	Dictionary       *Dictionary // lookup given dictionary, the caller has to provide it
-	MeanDeviation    float64     // minimum arithmetic mean deviation, by default disabled, standard 5
 }
 
 const (
-	MIN_COMPRESS         int     = 10
-	MIN_DIST             float64 = 10.0
-	MIN_ENTROPY          float64 = 3.0
-	MIN_DICT_LEN         int     = 5000
-	MAX_CHARS            int     = 95 // maximum printable US ASCII chars
-	LIMIT_MEAN_DEVIATION float64 = 20
+	MIN_COMPRESS int     = 10
+	MIN_DIST     float64 = 10.0
+	MIN_ENTROPY  float64 = 3.0
+	MIN_DICT_LEN int     = 5000
+	MAX_CHARS    int     = 95 // maximum printable US ASCII chars
 
 	//  we start  our ascii  arrays  at char(32),  so to  have max  95
 	// elements in the slice, we subtract 32 from each ascii code
 	ascii_base byte = 32
-
-	//  arithmetic  mean limits:  we work on  chr(32) til  chr(126) in
-	// ascii. The mean value, however, is not 63 as one would suppose,
-	// but  80, because most used  printable ascii chars exist  in the
-	// upper area  of the space. So,  we take 80 as  the middle ground
-	// and go beyond 5 up or down
-	mean_base float64 = 80
 )
 
 // Result stores the results of all validations.
@@ -56,7 +47,6 @@ type Result struct {
 	Compress         int     // actual compression rate in percent
 	CharDistribution float64 // actual character distribution in percent
 	Entropy          float64 // actual entropy value in bits/chars
-	Mean             float64 // actual arithmetic mean, close to 127.5 is best
 }
 
 // Validate  validates a given password.  You can  tune its  behavior
@@ -73,7 +63,6 @@ func Validate(passphrase string, opts ...Options) (Result, error) {
 		CharDistribution: MIN_DIST,
 		Entropy:          MIN_ENTROPY,
 		Dictionary:       nil,
-		MeanDeviation:    0,
 	}
 
 	if len(opts) == 1 {
@@ -131,16 +120,6 @@ func Validate(passphrase string, opts ...Options) (Result, error) {
 			result.Ok = false
 			result.DictionaryMatch = true
 		}
-	}
-
-	if options.MeanDeviation > 0 {
-		mean := getArithmeticMean(passphrase)
-
-		if mean > (mean_base+options.MeanDeviation) || mean < (mean_base-options.MeanDeviation) {
-			result.Ok = false
-		}
-
-		result.Mean = mean
 	}
 
 	return result, nil
@@ -262,28 +241,4 @@ func getDictMatch(passphrase string, dict *Dictionary) (bool, error) {
 	}
 
 	return false, nil
-}
-
-/*
-* Return  the arithmetic  mean value:
-
-	This is simply the result of summing the all the bytes (bits if the
-
--b  option  is specified)  in  the  file  and  dividing by  the  file
-length. If the  data are close to random, this  should be about 127.5
-(0.5 for -b option output). If  the mean departs from this value, the
-values are consistently high or low.
-
-	Working on US-ASCII space
-*/
-func getArithmeticMean(passphrase string) float64 {
-	sum := 0.0
-	count := 0.0
-
-	for _, char := range []byte(passphrase) {
-		sum += float64(char)
-		count++
-	}
-
-	return sum / count
 }
