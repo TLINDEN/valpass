@@ -1,8 +1,7 @@
-[![Go Report Card](https://goreportcard.com/badge/github.com/tlinden/valpass)](https://goreportcard.com/report/github.com/tlinden/valpass) 
-[![Actions](https://github.com/tlinden/valpass/actions/workflows/ci.yaml/badge.svg)](https://github.com/tlinden/valpass/actions)
-[![Go Coverage](https://github.com/tlinden/valpass/wiki/coverage.svg)](https://raw.githack.com/wiki/tlinden/valpass/coverage.html)
-![GitHub License](https://img.shields.io/github/license/tlinden/valpass)
-[![GoDoc](https://godoc.org/github.com/tlinden/valpass?status.svg)](https://godoc.org/github.com/tlinden/valpass)
+[![status-badge](https://ci.codeberg.org/api/badges/15685/status.svg)](https://ci.codeberg.org/repos/15685)
+[![Go Report Card](https://goreportcard.com/badge/codeberg.org/scip/valpass)](https://goreportcard.com/report/codeberg.org/scip/valpass) 
+[![License](https://img.shields.io/badge/license-GPL-blue.svg)](https://codeberg.org/scip/valpass/raw/branch/main/LICENSE)
+[![GoDoc](https://godoc.org/codeberg.org/scip/valpass?status.svg)](https://godoc.org/codeberg.org/scip/valpass)
 
 # valpass - a small golang module to verify passwords 
 
@@ -13,7 +12,7 @@ just for fun and to learn more about cryptography.
 During development I wrote a little helper tool
 which I could use to verify some quality metrics
 of my algorithm:
-[analyze.c](https://github.com/TLINDEN/twenty4/blob/master/analyze/analyze.c).
+[analyze.c](https://codeberg.org/scip/twenty4/blob/master/analyze/analyze.c).
 
 This module is a re-implementation of this code
 with go as a reusable module.
@@ -108,10 +107,14 @@ you can tune the quality thresholds as needed.
 
 ## Usage
 
-Usage is pretty simple:
+Usage is pretty simple. First, import the module:
+
+```default
+go get codeberg.org/scip/valpass/v2
+```
 
 ```go
-import "github.com/tlinden/valpass"
+import "codeberg.org/scip/valpass/v2"
 
 [..]
    res, err := valpass.Validate("password"); if err != nil {
@@ -140,8 +143,8 @@ type Options struct {
 To turn off a test, just set the tunable to zero.
 
 Please take a look at [the
-example](https://github.com/TLINDEN/valpass/blob/main/example/test.go)
-or at [the unit tests](https://github.com/TLINDEN/valpass/blob/main/lib_test.go).
+example](https://codeberg.org/scip/valpass/raw/branch/main/example/test.go)
+or at [the unit tests](https://codeberg.org/scip/valpass/raw/branch/main/lib_test.go).
 
 ## Performance
 
@@ -151,7 +154,7 @@ Benchmark results of version 0.0.1:
 % go test -bench=. -count 5
 goos: linux
 goarch: amd64
-pkg: github.com/tlinden/valpass
+pkg: codeberg.org/scip/valpass
 cpu: Intel(R) Core(TM) i7-10610U CPU @ 1.80GHz
 BenchmarkValidateEntropy-8         98703             12402 ns/op
 BenchmarkValidateEntropy-8         92745             12258 ns/op
@@ -184,7 +187,7 @@ BenchmarkValidateAllwDict-8          404           3022698 ns/op
 BenchmarkValidateAllwDict-8          393           3075163 ns/op
 BenchmarkValidateAllwDict-8          381           3112361 ns/op
 PASS
-ok      github.com/tlinden/valpass      54.017s
+ok      codeberg.org/scip/valpass      54.017s
 ```
 
 ## License 

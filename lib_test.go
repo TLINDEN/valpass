@@ -3,12 +3,13 @@ package valpass_test
 import (
 	"bufio"
 	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strings"
 	"testing"
 
-	"github.com/tlinden/valpass"
+	"codeberg.org/scip/valpass/v2"
 )
 
 type Passwordlist [][]string
@@ -372,7 +373,11 @@ func ReadDict(path string) []string {
 	if err != nil {
 		panic(err)
 	}
-	defer file.Close()
+	defer func() {
+		if err := file.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	var lines []string
 	scanner := bufio.NewScanner(file)
