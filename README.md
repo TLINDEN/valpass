@@ -5,6 +5,9 @@
 
 # valpass - a small golang module to verify passwords 
 
+> [!CAUTION]
+> This software is now being maintained on [Codeberg](https://codeberg.org/scip/valpass/).
+
 ## Background 
 
 A decade ago I designed an encryption algorithm
